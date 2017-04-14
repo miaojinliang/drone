@@ -14,7 +14,7 @@
 	<mvc:default-servlet-handler />
 	<!-- 自动扫描的包名 -->
 	<context:component-scan base-package="com.miao.test.**.controller" />
-	<context:component-scan base-package="com.miao.test.bean.MotorDriver" />
+	<!-- <context:component-scan base-package="com.miao.test.bean.MotorDriver" /> -->
 
 	<!-- 启用默认配置 add by kunka 2016-01-29 -->
 	<mvc:annotation-driven>

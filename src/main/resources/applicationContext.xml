@@ -18,22 +18,103 @@
 
 
     <!-- 配置ehCache缓存 -->
-	<bean id="cacheManagerFactory"
+	<!-- <bean id="cacheManagerFactory"
 		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:ehcache.xml" />
 	</bean>
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
 		<property name="cacheManager" ref="cacheManagerFactory" />
-	</bean>
+	</bean> -->
     <!-- spring配置 -->
 	<mvc:annotation-driven />
+	
+	<context:property-placeholder location="classpath:db.properties"/>
+	
+	 <!-- 配置数据源1 -->  
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">  
+        <property name="dbType" value="${dbType}"></property>  
+        <property name="url" value="${sqlServer.url}" />  
+        <property name="driverClassName" value="${sqlServer.driverClassName}"></property>  
+        <property name="username" value="${sqlServer.username}" />  
+        <property name="password" value="${sqlServer.password}" />  
+        <property name="initialSize" value="1" />  
+        <property name="maxActive" value="20" />  
+        <property name="minIdle" value="10" />  
+        <property name="maxWait" value="60000" />  
+        <!--<property name="poolPreparedStatements" value="false"></property>  
+        <property name="maxOpenPreparedStatements" value="20"></property> -->  
+        <property name="testOnBorrow" value="false" />  
+        <property name="testOnReturn" value="false" />  
+        <property name="testWhileIdle" value="true" />  
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />  
+        <property name="minEvictableIdleTimeMillis" value="25200000" />  
+        <property name="removeAbandoned" value="true" />  
+        <property name="removeAbandonedTimeout" value="1800" />  
+        <property name="logAbandoned" value="true" />  
+        <!-- 配置监控统计拦截的filters,配置log4j可以打印出Parameters -->  
+        <property name="filters" value="log4j" />  
+     </bean>  
+	
+	<bean id="mysqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/mybatis-Configuration.xml" />
+		<!-- <property name="mapperLocations" value="classpath:com/miao/test/mapper/*/*.xml" /> -->
+	</bean>
+	<!-- 扫描 basePackage下所有的接口，根据对应的mapper.xml为其生成代理类 -->
+	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.miao.test.mapper" />
+		<!-- <property name="sqlSessionFactoryBean" value="sqlSessionFactory" /> -->
+	</bean>
+	
+	 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource" />  
+    </bean>
+    
+     <!-- 注解方式配置事物 -->  
+    <tx:annotation-driven transaction-manager="transactionManager" />  
+  
+    <!-- 拦截器方式配置事物 -->  
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">  
+        <tx:attributes>  
+            <tx:method name="insert*" propagation="REQUIRED" />  
+            <tx:method name="update*" propagation="REQUIRED" />  
+            <tx:method name="delete*" propagation="REQUIRED" />  
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />  
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />  
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true" />  
+        </tx:attributes>  
+    </tx:advice>  
+    <aop:config>  
+        <aop:pointcut id="transactionPointcut" expression="execution(* com.miao.test.service..*(..))" />  
+        <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />  
+    </aop:config>  
+	
+	<!-- 配置druid监控spring jdbc -->  
+    <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor"></bean>  
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">  
+        <property name="patterns">  
+            <list>  
+                <value>com.miao.test.service.*</value>  
+            </list>  
+        </property>  
+    </bean>  
+    <aop:config>  
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut" />  
+    </aop:config>  
+      
+      
+    <!-- =====================================配置多数据源================================ -->  
+      
+      
+    <!-- =====================================结束================================ -->  
+      
+	
 	<context:component-scan base-package="com.miao.test">
 		<context:exclude-filter type="annotation"
 			expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 	
 	<bean id="motorDriver"  class="com.miao.test.bean.MotorDriver"/>
-	
 	
 	<!-- 配置外部数据信息 -->
 	<bean id="propertyConfigurer"

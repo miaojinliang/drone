@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<properties>
+		<!-- 数据库方言指定 -->
+        <!-- <property name="dialectClass" value="com.zehin.vpaas.dialect.MySQLDialect"/> -->
+        <!-- <property name="dialectClass" value="com.zehin.vpaas.dialect.OracleDialect"/> -->
+    </properties>
+
+    <settings>
+        <!-- 要真正存在一个与它对应的驼峰Bean与它对应才生效 -->
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        
+        <!-- 全局映射器启用缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+
+        <!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->
+        <setting name="multipleResultSetsEnabled" value="true"/>
+
+        <!-- 是否可以使用列的别名 (取决于驱动的兼容性) default:true-->
+        <!-- <setting name="useColumnLabel" value="true"/> -->
+
+        <!-- 设置触发延迟加载的方法  --> 
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+
+		<!-- 设置关联对象加载的形态，此处为按需加载字段(加载字段由SQL指 定)，不会加载关联表的所有字段，以提高性能 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        
+        
+    </settings>
+
+    <typeAliases>
+    	 <package name="com.miao.test.bean"/>  
+    </typeAliases>
+    	
+    	
+    <!-- <plugins>
+    	mybatis执行的拦截插件用以处理分页 
+        <plugin interceptor="com.zehin.vpaas.dialect.PaginationStatementHandlerInterceptor"/>
+        <plugin interceptor="com.zehin.vpaas.dialect.PaginationResultSetHandlerInterceptor"/>
+    </plugins>
+     -->
+</configuration>

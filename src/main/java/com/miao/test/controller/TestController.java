@@ -26,7 +26,7 @@ import com.pi4j.io.gpio.RaspiPin;
 public class TestController {
 	
 	
-	@Autowired
+	/*@Autowired
 	private CacheManager cacheManager;
 	
 	private List<MotorDriver> md=null;
@@ -138,5 +138,5 @@ public class TestController {
 		System.out.println("turnPuase");
 		Element element = new Element("run", false);  
 		cacheManager.getCache("raspTest").put(element);
-	}
+	}*/
 }
