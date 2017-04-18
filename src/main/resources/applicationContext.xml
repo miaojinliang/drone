@@ -114,8 +114,6 @@
 			expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 	
-	<bean id="motorDriver"  class="com.miao.test.bean.MotorDriver"/>
-	
 	<!-- 配置外部数据信息 -->
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">

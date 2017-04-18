@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.miao.test.mapper.DroneMapper" >
+  <resultMap id="BaseResultMap" type="com.miao.test.bean.Drone" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="seq" property="seq" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="start_delay" property="startDelay" jdbcType="INTEGER" />
+    <result column="dir_pin" property="dirPin" jdbcType="INTEGER" />
+    <result column="pul_pin" property="pulPin" jdbcType="INTEGER" />
+    <result column="direction" property="direction" jdbcType="INTEGER" />
+    <result column="interval" property="interval" jdbcType="INTEGER" />
+    <result column="before_pin" property="beforePin" jdbcType="INTEGER" />
+    <result column="back_pin" property="backPin" jdbcType="INTEGER" />
+    <result column="rotate_delay" property="rotate_delay" jdbcType="INTEGER" />
+    <result column="start_button" property="startButton" jdbcType="VARCHAR" />
+    <result column="back_button" property="back_button" jdbcType="VARCHAR" />
+    <result column="stop_button" property="stopButton" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id,name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button
+  </sql>
+  <select id="getDrones" resultType="com.miao.test.bean.Drone" >
+  	SELECT * FROM drone order by id desc
+  </select>
+  
+  <insert id="insertDrone" parameterType="com.miao.test.bean.Drone">
+  	INSERT INTO drone (name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button) 
+  	values (#{name},#{type},#{seq},#{startDelay},#{dirPin},#{pulPin},#{direction},#{interval},#{beforePin},#{backPin},#{rotateDelay},#{startButton},#{backButton},#{stopButton})
+  </insert>
+  
+  <delete id="deleteDrone" parameterType="java.lang.Integer">
+  	DELETE FROM drone WHERE id = #{id}
+  </delete>
+  
+  <update id="updateDrone" parameterType="com.miao.test.bean.Drone">
+  	UPDATE drone SET 
+  	name = #{name},
+  	type = #{type},
+  	seq = #{seq},
+  	start_delay = #{startDelay},
+  	dir_pin = #{dirPin},
+  	pul_pin = #{pulPin},
+  	direction=#{direction},
+  	interval=#{interval},
+  	before_pin=#{beforePin},
+  	back_pin=#{backPin},
+  	rotate_delay=#{rotateDelay},
+  	start_button=#{startButton},
+  	back_button=#{backButton},
+  	stop_button=#{stopButton} 
+  	WHERE id = #{id}
+  </update>
+</mapper>

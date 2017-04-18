@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.miao.test.mapper.AccessMapper" >
+  <resultMap id="BaseResultMap" type="com.miao.test.bean.Access" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="back_delay" property="backDelay" jdbcType="INTEGER" />
+    <result column="drone_id" property="droneId" jdbcType="INTEGER" />
+    <result column="open_status" property="openStatus" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id,name,type,back_delay,drone_id,open_status
+  </sql>
+  <select id="getAccessByDronId" resultType="com.miao.test.bean.Access" >
+  	SELECT * FROM access where drone_id  = #{droneId} order by id desc
+  </select>
+  
+  <insert id="insertAccessForDrone" parameterType="com.miao.test.bean.Access">
+  	INSERT INTO access (name,type,back_delay,drone_id,open_status) 
+  	VALUES (#{name},#{type},#{backDelay},#{droneId},#{openStatus})
+  </insert>
+  
+  <delete id="deleteAccess" parameterType="java.lang.Integer">
+  	DELETE FROM access WHERE id = #{id}
+  </delete>
+  
+  <update id="updateAccess" parameterType="com.miao.test.bean.Access">
+  	UPDATE access SET 
+  	name = #{name}, 
+  	type = #{type}, 
+  	back_delay=#{backDelay}, 
+  <!-- 	drone_id=#{droneId},  -->
+  	open_status=#{openStatus} 
+  	WHERE id = #{id}
+  </update>
+</mapper>

@@ -7,10 +7,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.miao.test.bean.MotorBean;
-import com.miao.test.bean.MotorDriver;
-import com.miao.test.bean.RelayDriver;
 import com.miao.test.common.CommonCore;
+import com.miao.test.driver.MotorBean;
+import com.miao.test.driver.MotorDriver;
+import com.miao.test.driver.RelayDriver;
 
 
 public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedEvent>{
@@ -28,12 +28,11 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 			System.out.println("spring初始化是执行一次");
 			
 			System.out.println(motorDrivers);
-			
-			List<MotorBean> motorBeans = JSONObject.parseArray(motorDrivers, MotorBean.class);
-			//初始化本系统中的马达驱动器
-			initMotorDrivers(motorBeans);
-			//初始化继电器马达
-			initRelayDriver();
+//			List<MotorBean> motorBeans = JSONObject.parseArray(motorDrivers, MotorBean.class);
+//			//初始化本系统中的马达驱动器
+//			initMotorDrivers(motorBeans);
+//			//初始化继电器马达
+//			initRelayDriver();
 		}
 	}
 	
