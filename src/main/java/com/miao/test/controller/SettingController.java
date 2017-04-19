@@ -32,6 +32,14 @@ public class SettingController {
 		return "setting";
 	}
 	
+	
+	@RequestMapping(value = "/droneModify")
+	public String droneModify(HttpServletRequest request, HttpServletResponse response,ModelMap model,@RequestParam("id") Integer id){
+		Drone drone = droneService.getById(id);
+		model.put("drone", drone);
+		return "droneModify";
+	}
+	
 	@RequestMapping(value = "/addDrone")
 	@ResponseBody
 	public Integer addDrone(Drone drone){
@@ -40,10 +48,9 @@ public class SettingController {
 	}
 	
 	@RequestMapping(value = "/deleteDrone")
-	@ResponseBody
-	public Integer deleteDrone(@RequestParam("id") Integer id){
+	public String deleteDrone(@RequestParam("id") Integer id){
 		droneService.deleteDrone(id);
-		return 1;
+		return "redirect:setting";
 	}
 	
 	@RequestMapping(value = "/getDrones")
@@ -61,23 +68,24 @@ public class SettingController {
 	
 	
 	@RequestMapping(value = "/addAccess")
-	@ResponseBody
-	public Integer addAccess(Access access){
+	public String addAccess(Access access){
 		accessService.insertAccessForDrone(access);
-		return 1;
+		return "redirect:getAccesses?droneId="+access.getDroneId();
 	}
 	
 	@RequestMapping(value = "/deleteAccess")
-	@ResponseBody
-	public Integer deleteAccess(@RequestParam("id") Integer id){
+	public String deleteAccess(@RequestParam("id") Integer id,@RequestParam("droneId") Integer droneId){
 		accessService.deleteAccess(id);
-		return 1;
+		return "redirect:getAccesses?droneId="+droneId;
 	}
 	
 	@RequestMapping(value = "/getAccesses")
-	@ResponseBody
-	public List<Access> getAccesses(@RequestParam("droneId") Integer droneId){
-		return accessService.getAccessByDronId(droneId);
+	public String getAccesses(HttpServletRequest request, HttpServletResponse response,@RequestParam("droneId") Integer droneId,ModelMap model){
+		List<Access> access = accessService.getAccessByDronId(droneId);
+		Drone drone = droneService.getById(droneId);
+		model.put("drone", drone);
+		model.put("accessList", access);
+		return "access";
 	}
 	
 	@RequestMapping(value = "/updateAccess")

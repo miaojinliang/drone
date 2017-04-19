@@ -11,4 +11,5 @@ public interface AccessMapper {
 	void insertAccessForDrone(Access access);
 	void deleteAccess(@Param("id") Integer id);
 	void updateAccess(Access access);
+	Access getById(@Param("id") Integer id);
 }

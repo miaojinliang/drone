@@ -9,9 +9,11 @@
     <result column="drone_id" property="droneId" jdbcType="INTEGER" />
     <result column="open_status" property="openStatus" jdbcType="INTEGER" />
   </resultMap>
+  
   <sql id="Base_Column_List" >
     id,name,type,back_delay,drone_id,open_status
   </sql>
+  
   <select id="getAccessByDronId" resultType="com.miao.test.bean.Access" >
   	SELECT * FROM access where drone_id  = #{droneId} order by id desc
   </select>
@@ -34,4 +36,9 @@
   	open_status=#{openStatus} 
   	WHERE id = #{id}
   </update>
+  
+  <select id="getById" resultMap="BaseResultMap">
+  	SELECT * FROM access WHERE id = #{id}
+  </select>
+  
 </mapper>

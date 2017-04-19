@@ -9,6 +9,7 @@ import com.miao.test.bean.Drone;
 public interface DroneService {
 	List<Drone> getDrones();
 	void insertDrone(Drone drone);
-	void deleteDrone(@Param("id") Integer id);
+	void deleteDrone(Integer id);
 	void updateDrone(Drone drone);
+	Drone getById(Integer id);
 }

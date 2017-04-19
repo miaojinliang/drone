@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false"  pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +10,8 @@
 <script src="common/jqueryMobile/jquery.min.js"></script>
 <script src="common/jqueryMobile/jquery.mobile-1.4.5.js"></script>
 <script src="common/js/setting.js"></script>
+<script src="common/js/droneModify.js"></script>
+<script src="common/js/access.js"></script>
 <style>
 th {
     border-bottom: 1px solid #d6d6d6;
@@ -24,7 +27,7 @@ tr:nth-child(even) {
 <div data-role="page" id="mainPage">
   <div data-role="header">
     <h1>靶机列表</h1>
-    <a href="#addPage"  data-transition="flip" class="ui-btn ui-btn-right ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left">添加靶机</a>
+    <a href="#addPage"  data-transition="pop" class="ui-btn ui-btn-right ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left">添加靶机</a>
   </div>
   <div data-role="main" class="ui-content" id="droneMain">
   	<table data-role="table" data-mode="columntoggle" class="ui-responsive" data-column-btn-text="显示/隐藏列">
@@ -33,17 +36,18 @@ tr:nth-child(even) {
           <th data-priority="1">名称</th>
           <th data-priority="1">序号</th>
           <th data-priority="1">类型</th>
-          <th data-priority="6">起步延迟时间</th>
+          <th data-priority="6">起步延迟(秒)</th>
           <th data-priority="2">转向Pin</th>
           <th data-priority="2">转速Pin</th>
           <th data-priority="3">速度</th>
           <th data-priority="2">正转Pin</th>
           <th data-priority="2">反转Pin</th>
-          <th data-priority="6">旋转延迟</th>
+          <th data-priority="6">旋转延迟(秒)</th>
           <th data-priority="6">开始按钮</th>
           <th data-priority="6">返回按钮</th>
           <th data-priority="6">停止按钮</th>
           <th data-priority="1">操作</th>
+          <th data-priority="1">开关管理</th>
         </tr>
       </thead>
       <tbody id="droneTbody">
@@ -54,7 +58,7 @@ tr:nth-child(even) {
           <td>
 			<c:choose>
 	         	<c:when test="${drone.type==1}">
-		       		单步进点击
+		       		单步进电机
 		     	</c:when>
 		     	<c:when test="${drone.type==2}">
 					单继电器电机
@@ -67,17 +71,22 @@ tr:nth-child(even) {
 				</c:otherwise>
 			</c:choose>
           </td>
-          <td>${ drone.startDelay}</td>
+          <td>${ drone.startDelay} <c:if test="${drone.startDelay!=null }">秒</c:if></td>
           <td>${ drone.dirPin}</td>
           <td>${ drone.pulPin}</td>
           <td>${ 10-drone.interval}</td>
           <td>${ drone.beforePin}</td>
           <td>${ drone.backPin}</td>
-          <td>${ drone.rotateDelay}</td>
+          <td>
+          ${ drone.rotateDelay}
+          	<c:if test="${drone.rotateDelay!=null }">秒</c:if>
+          	 </td>
           <td>${ drone.startButton}</td>
           <td>${ drone.backButton}</td>
           <td>${ drone.stopButton}</td>
-          <td><a>修改</a>|<a>删除</a></td>
+          <td><a href = "${ctx }/droneModify?id=${drone.id}"  data-transition="pop" >修改</a>&nbsp;
+          |&nbsp;&nbsp;<a href = "${ctx }/deleteDrone?id=${drone.id}" onclick="return confirm('确定删除?');">删除</a></td>
+          <td><a href = "${ctx }/getAccesses?droneId=${drone.id}" >管理</a></td>
         </tr>
       </c:forEach>
       </tbody>
@@ -98,12 +107,21 @@ tr:nth-child(even) {
 	<div data-role="page" id="addPage">
       <div data-role="header">
         <h1>添加靶机</h1>
-        <a href="#mainPage" id="backToMain"  data-transition="flip" class="ui-btn ui-corner-all ui-shadow ui-btn-left ui-btn-b ui-icon-back ui-btn-icon-left">返回</a>
+        <a href="#mainPage" id="backToMain"  data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-left ui-btn-b ui-icon-back ui-btn-icon-left">返回</a>
         <a href="#" onclick="saveDrone();" class="ui-btn ui-corner-all ui-shadow ui-btn-right ui-btn-b ui-icon-check ui-btn-icon-left">保存</a>
       </div>
 
       <div data-role="main" class="ui-content">
         <div class="ui-field-contain">
+	        <label for="droneName">名称：</label>
+        	<input type="text" name="name" id="droneName">
+        	
+        	<label for="droneSeq">序号：</label>
+        	<input type="text" name="seq" id="droneSeq">
+        	
+        	<label for="startDelay">起步延迟(秒)：</label>
+        	<input type="text" name="startDelay" id="startDelay">
+        	
         	<label for="droneType">靶机类型:</label>
         	<select name="droneType" onchange="changeType(this.options[this.options.selectedIndex].value);" id="droneType">
 	         <option value="1">单步进电机</option>
@@ -111,14 +129,6 @@ tr:nth-child(even) {
 	         <option value="3">组合电机</option>
 	        </select>
 	        
-	        <label for="droneName">名称：</label>
-        	<input type="text" name="name" id="droneName">
-        	
-        	<label for="droneSeq">序号：</label>
-        	<input type="text" name="seq" id="droneSeq">
-        	
-        	<label for="startDelay">起步延迟：</label>
-        	<input type="text" name="startDelay" id="startDelay">
        	</div>
         	
        	<div id="type1" data-role="fieldcontain" >
@@ -152,7 +162,7 @@ tr:nth-child(even) {
        	</div>
         	
        	<div id="type3" data-role="fieldcontain">
-        	<label for="rotateDelay">旋转延迟：</label>
+        	<label for="rotateDelay">旋转延迟(秒)：</label>
         	<input type="text" name="rotateDelay" id="rotateDelay">
        	</div>
         	

@@ -35,4 +35,9 @@ public class AccessServiceImpl implements AccessService {
 		accessMapper.updateAccess(access);
 	}
 
+	@Override
+	public Access getById(Integer id) {
+		return accessMapper.getById(id);
+	}
+
 }

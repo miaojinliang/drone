@@ -27,7 +27,7 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 		if(event.getApplicationContext().getParent()==null){
 			System.out.println("spring初始化是执行一次");
 			
-			System.out.println(motorDrivers);
+//			System.out.println(motorDrivers);
 //			List<MotorBean> motorBeans = JSONObject.parseArray(motorDrivers, MotorBean.class);
 //			//初始化本系统中的马达驱动器
 //			initMotorDrivers(motorBeans);

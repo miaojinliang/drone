@@ -11,5 +11,5 @@ public interface DroneMapper {
 	void insertDrone(Drone drone);
 	void deleteDrone(@Param("id") Integer id);
 	void updateDrone(Drone drone);
-	
+	Drone getById(@Param("id") Integer id);
 }

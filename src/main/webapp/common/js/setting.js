@@ -23,15 +23,15 @@
 //
 
 $(function(){
-	$('#type2').hide();
-	$('#type3').hide();
-//	getDrones();
+	var droneType = $('#droneType').val();
+	changeType(droneType);
+	console.log(droneType);
 });
 
 var changeType = function(v){
 	switch (v) {
 	case "1":
-		console.log("case 1")
+		console.log("case 333")
 		$('#type1').show();
 		$('#type2').hide();
 		$('#type3').hide();
@@ -124,5 +124,29 @@ var getDrones = function(){
 			alert("未知错误！");
 		}
 	});
+};
+
+
+var m_changeType = function(v){
+	switch (v) {
+	case "1":
+		$('#m_type1').show();
+		$('#m_type2').hide();
+		$('#m_type3').hide();
+		break;
+	case "2":
+		$('#m_type1').hide();
+		$('#m_type2').show();
+		$('#m_type3').hide();
+		break;
+	case "3":
+		$('#m_type1').show();
+		$('#m_type2').show();
+		$('#m_type3').show();
+	break;
+
+	default:
+		break;
+	}
 };
 
