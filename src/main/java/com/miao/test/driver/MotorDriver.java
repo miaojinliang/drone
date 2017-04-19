@@ -16,17 +16,20 @@ import com.pi4j.io.gpio.event.GpioPinListenerAnalog;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 public class MotorDriver {
-	private GpioPinDigitalOutput pin_dir;
-	private GpioPinDigitalOutput pin_pul;
-	private GpioPinDigitalInput pin_back;// 返回运动开关
-	private GpioPinDigitalInput pin_stop;// 停止运动开关
-	private Long delayTime;
-	private Integer motorNum;// 马达编号
+	private GpioPinDigitalOutput pin_dir;//转向pin
+	private GpioPinDigitalOutput pin_pul;//转速pin
+	
+	private Integer type;//电机类型1:步进电机；2：继电器电机;3：步进点击+继电器点击
+	private Long startDelay;//起步延迟时间(秒)
+	
+	private Integer motorNum;// 马达id
 	private Integer direction;// 转向，0 正方向，1反方向
 	private Integer interval = 5;// 脉冲频率，毫秒
 	private Boolean running = false;// 马达状态，false：暂停；true：转动（转动的方向取自direction）
 
-	private Integer cycly = 200;
+	private GpioPinDigitalOutput pin_before;//正转
+	private GpioPinDigitalOutput pin_back1;//反转
+	private Long rotateDelay;//靶机旋转延迟时间
 
 //	private GpioStepperMotorControl controlThread = new GpioStepperMotorControl();
 
@@ -35,42 +38,94 @@ public class MotorDriver {
 
 	private static final int speeds[] = { 1000, 900, 800, 10000, 5000, 1000, 500, 100, 50, 10, 1 };
 
-	private GpioPinListenerDigital backListener = new GpioPinListenerDigital() {
-		@Override
-		public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-			if (event.getState().isHigh()) {
-				if(running){
-					running = false;
-					try {
-						Thread.sleep(delayTime);
-						if(pin_dir.isHigh()){
-							pin_dir.setState(PinState.LOW);
-						}else{
-							pin_dir.setState(PinState.HIGH);
+//	private GpioPinListenerDigital backListener = new GpioPinListenerDigital() {
+//		@Override
+//		public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+//			if (event.getState().isHigh()) {
+//				if(running){
+//					running = false;
+//					try {
+//						Thread.sleep(delayTime);
+//						if(pin_dir.isHigh()){
+//							pin_dir.setState(PinState.LOW);
+//						}else{
+//							pin_dir.setState(PinState.HIGH);
+//						}
+//						running = true;
+//						move();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//	};
+
+//	private GpioPinListenerDigital stopListener = new GpioPinListenerDigital() {
+//
+//		@Override
+//		public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+//			if (event.getState().isHigh()) {
+//				if(running){
+//					running = false;
+//				}
+//			}
+//		}
+//
+//	};
+	
+	private GpioPinListenerDigital getStopListener(final Integer accessType){
+		GpioPinListenerDigital stopListener = new GpioPinListenerDigital() {
+
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				if(accessType==2){
+					if (event.getState().isHigh()) {
+						if(running){
+							running = false;
 						}
-						running = true;
-						move();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+					}
+				}else if(accessType==1){
+					if (event.getState().isLow()) {
+						if(running){
+							running = false;
+						}
+					}
+				}
+				
+			}
+
+		};
+		return stopListener;
+	}
+	
+	
+	private GpioPinListenerDigital getBackListener(final Long delayTime){
+		GpioPinListenerDigital backListener = new GpioPinListenerDigital() {
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				if (event.getState().isHigh()) {
+					if(running){
+						running = false;
+						try {
+							Thread.sleep(delayTime);
+							if(pin_dir.isHigh()){
+								pin_dir.setState(PinState.LOW);
+							}else{
+								pin_dir.setState(PinState.HIGH);
+							}
+							running = true;
+							move();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
-		}
-	};
-
-	private GpioPinListenerDigital stopListener = new GpioPinListenerDigital() {
-
-		@Override
-		public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-			if (event.getState().isHigh()) {
-				if(running){
-					running = false;
-				}
-			}
-		}
-
-	};
-
+		};
+		return backListener;
+	}
+	
 	// private GpioPinListenerAnalog pinListener = new GpioPinListenerAnalog() {
 	//
 	// @Override
@@ -85,28 +140,31 @@ public class MotorDriver {
 
 	public MotorDriver() {
 	}
-
-	public MotorDriver(Integer dirPin, Integer pulPin, Integer motorNum, Integer backPin, Integer stopPin,
-			Long dtime) {
-		this.motorNum = motorNum;
-		this.delayTime = dtime;
-		final GpioController gpio = GpioFactory.getInstance();
-		pin_dir = gpio.provisionDigitalOutputPin(getGPIONum(dirPin), "dirPin", PinState.HIGH);
-		pin_pul = gpio.provisionDigitalOutputPin(getGPIONum(pulPin), "pulPin", PinState.HIGH);
-		// 停止接近开关
-		pin_stop = gpio.provisionDigitalInputPin(getGPIONum(stopPin));
-		// 顶点接近开关
-		pin_back = gpio.provisionDigitalInputPin(getGPIONum(backPin));
-		pin_back.setShutdownOptions(true, PinState.LOW);
-		pin_back.addListener(backListener);
-
-		pin_stop.setShutdownOptions(true, PinState.LOW);
-		pin_stop.addListener(stopListener);
-
-		pin_dir.setShutdownOptions(true, PinState.LOW);
-		pin_pul.setShutdownOptions(true, PinState.LOW);
-
-	}
+	
+	
+	
+//
+//	public MotorDriver(Integer dirPin, Integer pulPin, Integer motorNum, Integer backPin, Integer stopPin,
+//			Long dtime) {
+//		this.motorNum = motorNum;
+//		this.delayTime = dtime;
+//		final GpioController gpio = GpioFactory.getInstance();
+//		pin_dir = gpio.provisionDigitalOutputPin(getGPIONum(dirPin), "dirPin", PinState.HIGH);
+//		pin_pul = gpio.provisionDigitalOutputPin(getGPIONum(pulPin), "pulPin", PinState.HIGH);
+//		// 停止接近开关
+//		pin_stop = gpio.provisionDigitalInputPin(getGPIONum(stopPin));
+//		// 顶点接近开关
+//		pin_back = gpio.provisionDigitalInputPin(getGPIONum(backPin));
+//		pin_back.setShutdownOptions(true, PinState.LOW);
+//		pin_back.addListener(backListener);
+//
+//		pin_stop.setShutdownOptions(true, PinState.LOW);
+//		pin_stop.addListener(stopListener);
+//
+//		pin_dir.setShutdownOptions(true, PinState.LOW);
+//		pin_pul.setShutdownOptions(true, PinState.LOW);
+//
+//	}
 
 	// 设置马达转动方向
 	public void setDirection(Integer direction) {

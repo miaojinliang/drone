@@ -25,8 +25,8 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		//root application context 没有parent，他就是老大，这里避免执行多次，只执行一次初始化就够了。
 		if(event.getApplicationContext().getParent()==null){
-			System.out.println("spring初始化是执行一次");
-			
+//			System.out.println("spring初始化是执行一次");
+//			
 //			System.out.println(motorDrivers);
 //			List<MotorBean> motorBeans = JSONObject.parseArray(motorDrivers, MotorBean.class);
 //			//初始化本系统中的马达驱动器
@@ -46,7 +46,8 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 			Integer motorStopPin = mb.getStopPin();
 			Long delayTime = mb.getDelayTime();
 			
-			MotorDriver md = new MotorDriver(motorDirPin, motorPulPin, motorNum,motorBackPin,motorStopPin,delayTime);
+//			MotorDriver md = new MotorDriver(motorDirPin, motorPulPin, motorNum,motorBackPin,motorStopPin,delayTime);
+			MotorDriver md = new MotorDriver();
 			CommonCore.motorDrivers.add(md);
 		}
 	}
