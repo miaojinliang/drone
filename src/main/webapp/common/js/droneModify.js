@@ -43,10 +43,14 @@ var m_getFormValues = function(){
 	var startButton = $('#m_startButton').val();
 	var backButton = $('#m_backButton').val();
 	var stopButton = $('#m_stopButton').val();
+	var rotateStart = $('#m_rotateStart').val();
+	var rotateBack = $('#m_rotateBack').val();
+	var rotateStop = $('#m_rotateStop').val();
 	
 	return {id:droneId,type:droneType,name:droneName,seq:droneSeq,startDelay:startDelay,dirPin:dirPin,
 		pulPin:pulPin,interval:interval,beforePin:beforePin,backPin:backPin,
-		rotateDelay:rotateDelay,startButton:startButton,backButton:backButton,stopButton:stopButton};
+		rotateDelay:rotateDelay,startButton:startButton,backButton:backButton,stopButton:stopButton,
+		rotateStart:rotateStart,rotateBack:rotateBack,rotateStop:rotateStop};
 };
 
 var updateDrone = function(){

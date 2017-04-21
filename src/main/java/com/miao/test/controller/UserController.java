@@ -16,13 +16,10 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	
 	@RequestMapping(value = "/checkUser")
 	@ResponseBody
 	public Integer checkUser(@RequestParam("username")  String username,@RequestParam("password") String password){
 		return userService.getUser(username, password).size();
-	}
-	@RequestMapping(value = "/index")
-	public String toIndex(){
-		return "index";
 	}
 }

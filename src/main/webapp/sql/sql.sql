@@ -15,7 +15,13 @@ create table drone (
 	[direction]		integer,
 	[before_pin]	integer,
 	[back_pin]		integer,
-	[rotate_delay]	integer
+	[rotate_delay]	integer,
+	[start_button]  varchar(50),
+	[stop_button]	varchar(50),
+	[back_button]	varchar(50),
+	[rotate_start]	varchar(50),
+	[rotate_stop]	varchar(50),
+	[rotate_back]	varchar(50)
 );
 
 create table access(
@@ -24,5 +30,16 @@ create table access(
 	[type]			integer,
 	[back_delay]	integer,
 	[drone_id]		integer,
-	[open_status]	integer
+	[open_status]	integer,
+	[pin_num]		integer
+);
+
+
+create table raspclient(
+	[id]			integer PRIMARY KEY autoincrement,
+	[ip]			varchar(50),
+	[port]			varchar(50),
+	[name]			varchar(50),
+	[app_name]		varchar(50),
+	[remark]		varchar(200)
 );

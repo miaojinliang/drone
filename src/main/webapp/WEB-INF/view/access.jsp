@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>控制台</title>
+<title>开关设置</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="common/jqueryMobile/jquery.mobile-1.4.5.css">
 <script src="common/jqueryMobile/jquery.min.js"></script>
@@ -53,6 +53,9 @@ tr:nth-child(even) {
 	         <option value="2">低电位常开</option>
 	        </select>
 	        
+	        <label for="pinNum">Pin针脚：</label>
+        	<input type="text" name="pinNum" id="pinNum">
+	        
 	        <input type="submit" data-inline="true" value="提交">
         </fieldset>
   	 </form>
@@ -63,6 +66,7 @@ tr:nth-child(even) {
         <tr>
           <th data-priority="1">名称</th>
           <th data-priority="1">类型</th>
+          <th data-priority="1">Pin针脚</th>
           <th data-priority="1">返回延迟(秒)</th>
           <th data-priority="1">开关类型</th>
           <th data-priority="1">操作</th>
@@ -91,6 +95,7 @@ tr:nth-child(even) {
 				</c:otherwise>
 			</c:choose>
           </td>
+          <td>${ access.pinNum}</td>
           <td>${ access.backDelay} <c:if test="${access.backDelay!=null }">秒</c:if></td>
           <td>
           	<c:choose>

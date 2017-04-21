@@ -17,10 +17,13 @@
     <result column="start_button" property="startButton" jdbcType="VARCHAR" />
     <result column="back_button" property="backButton" jdbcType="VARCHAR" />
     <result column="stop_button" property="stopButton" jdbcType="VARCHAR" />
+    <result column="rotate_start" property="rotateStart" jdbcType="VARCHAR" />
+    <result column="rotate_back" property="rotateBack" jdbcType="VARCHAR" />
+    <result column="rotate_stop" property="rotateStop" jdbcType="VARCHAR" />
   </resultMap>
   
   <sql id="Base_Column_List" >
-    id,name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button
+    id,name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button,rotate_start,rotate_back,rotate_stop
   </sql>
   
   <select id="getDrones" resultType="com.miao.test.bean.Drone" >
@@ -28,8 +31,8 @@
   </select>
   
   <insert id="insertDrone" parameterType="com.miao.test.bean.Drone">
-  	INSERT INTO drone (name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button) 
-  	values (#{name},#{type},#{seq},#{startDelay},#{dirPin},#{pulPin},#{direction},#{interval},#{beforePin},#{backPin},#{rotateDelay},#{startButton},#{backButton},#{stopButton})
+  	INSERT INTO drone (name,type,seq,start_delay,dir_pin,pul_pin,direction,interval,before_pin,back_pin,rotate_delay,start_button,back_button,stop_button,rotate_start,rotate_back,rotate_stop) 
+  	values (#{name},#{type},#{seq},#{startDelay},#{dirPin},#{pulPin},#{direction},#{interval},#{beforePin},#{backPin},#{rotateDelay},#{startButton},#{backButton},#{stopButton},#{rotateStart},#{rotateBack},#{rotateStop})
   </insert>
   
   <delete id="deleteDrone" parameterType="java.lang.Integer">
@@ -51,7 +54,10 @@
   	rotate_delay=#{rotateDelay},
   	start_button=#{startButton},
   	back_button=#{backButton},
-  	stop_button=#{stopButton} 
+  	stop_button=#{stopButton},
+  	rotate_start=#{rotateStart},
+  	rotate_back=#{rotateBack},
+  	rotate_stop=#{rotateStop}
   	WHERE id = #{id}
   </update>
   

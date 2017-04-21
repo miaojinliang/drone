@@ -1,3 +1,6 @@
+<%@ page contentType="text/html;charset=UTF-8" session="false"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +20,7 @@
 </style>
 </head>
 <body>
-<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+<!-- <div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
     <div data-role="header" data-theme="a">
     <h1>提示</h1>
     </div>
@@ -25,41 +28,31 @@
         <h3 class="ui-title">请选择需要控制的设备！</h3>
         <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">关闭</a>
     </div>
-</div>
-<div data-role="page" id="pageone">
+</div> -->
+<div data-role="page" id="pageCenter">
   <div data-role="header">
-    <h1>步进电机控制台</h1>
+    <h1>中心控制台</h1>
   </div>
-	<table margin="0" id="motorTable" >
-<!-- 		<tbody>
-			<tr>
-				<th><h3>1号马达</h3></th>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">前进</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">暂停</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">后退</a></td>
-			</tr>
-			<tr>
-				<th><h3>2号马达</h3></th>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">前进</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">暂停</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline">后退</a></td>
-			</tr>
-		</tbody> -->
-	</table>
-	
-	<div data-role="header">
-    <h1>继电器控制台</h1>
+  <div data-role="main" class="ui-content">
+  
+  <c:forEach items="${allDrones}" var="drone" varStatus="status">
+  	<div data-role="collapsible" data-collapsed="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
+        <h3>${drone.name }</h3>
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="droneMove('${drone.id}','${drone.raspClient.id }','START')" >${drone.startButton }</a>
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="droneMove('${drone.id}','${drone.raspClient.id }','STOP')" >${drone.stopButton }</a>
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="droneMove('${drone.id}','${drone.raspClient.id }','BACK')" >${drone.backButton }</a>
+	      <c:if test="${drone.type==3 }">
+	      	 &nbsp;|&nbsp;&nbsp;
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="rotateMove('${drone.id}','${drone.raspClient.id }','START')" >${drone.rotateStart }</a>
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="rotateMove('${drone.id}','${drone.raspClient.id }','STOP')">${drone.rotateStop }</a>
+	      <a href="#" class="ui-btn ui-btn-inline" onclick="rotateMove('${drone.id}','${drone.raspClient.id }','BACK')">${drone.rotateBack }</a>
+	      </c:if>
+	      <c:if test="${drone.type!=2 }">
+	      	<input type="range" name="points" id="points" onchange="changeInterval('${drone.id}','${drone.raspClient.id }',this.value)" value="${drone.interval }" min="1" max="9" data-popup-enabled="true">
+      	</c:if>
+      </div>
+  </c:forEach>
   </div>
-	<table margin="0" >
-		<tbody>
-			<tr>
-				<th><h3>继电器机组</h3></th>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline" onclick="relayBefore();">A（正传）</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline" onclick="relayBack();">B（反转）</a></td>
-				<td><a class="ui-btn ui-corner-all ui-shadow ui-btn-inline" onclick="relayStop();">C（全部停止）</a></td>
-			</tr>
-		</tbody>
-	</table>
   <div data-role="footer">
     <h1>联系电话：133xxxxxxxx</h1>
   </div>

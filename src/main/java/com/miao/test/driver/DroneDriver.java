@@ -2,7 +2,9 @@ package com.miao.test.driver;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import com.miao.test.bean.Access;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -10,12 +12,10 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.event.GpioPinAnalogValueChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
-import com.pi4j.io.gpio.event.GpioPinListenerAnalog;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-public class MotorDriver {
+public class DroneDriver {
 	private GpioPinDigitalOutput pin_dir;//转向pin
 	private GpioPinDigitalOutput pin_pul;//转速pin
 	
@@ -23,12 +23,15 @@ public class MotorDriver {
 	private Long startDelay;//起步延迟时间(秒)
 	
 	private Integer motorNum;// 马达id
-	private Integer direction;// 转向，0 正方向，1反方向
+	private Integer motorDirection;// 步进点击转向，0 正方向，1反方向
+	private Integer relayDirection;//继电器点击转动方向，0：正向，1：反向
+	
 	private Integer interval = 5;// 脉冲频率，毫秒
-	private Boolean running = false;// 马达状态，false：暂停；true：转动（转动的方向取自direction）
+	private Boolean motorRunning = false;// 步进电机马达状态，false：暂停；true：转动（转动的方向取自direction）
+	private Boolean relayRunning = false;//继电器电机马达状态 false：暂停；true：转动
 
 	private GpioPinDigitalOutput pin_before;//正转
-	private GpioPinDigitalOutput pin_back1;//反转
+	private GpioPinDigitalOutput pin_back;//反转
 	private Long rotateDelay;//靶机旋转延迟时间
 
 //	private GpioStepperMotorControl controlThread = new GpioStepperMotorControl();
@@ -74,21 +77,68 @@ public class MotorDriver {
 //
 //	};
 	
-	private GpioPinListenerDigital getStopListener(final Integer accessType){
+	/**
+	 * 无参构造器
+	 */
+	public DroneDriver() {
+	}
+	
+	/**
+	 * 初始化构造器
+	 * @param id
+	 * @param type
+	 * @param startDelay
+	 * @param dirPin
+	 * @param pulPin
+	 * @param interval
+	 * @param beforePin
+	 * @param backPin
+	 * @param rotateDelay
+	 * @param accesses
+	 */
+	public DroneDriver(Integer id, Integer type, Long startDelay,
+			Integer dirPin, Integer pulPin, Integer interval,
+			Integer beforePin, Integer backPin, Long rotateDelay,List<Access> accesses) {
+		this.motorNum = id;
+		this.startDelay = startDelay;
+		this.interval = interval;
+		this.rotateDelay = rotateDelay;
+		this.type=type;
+		final GpioController gpio = GpioFactory.getInstance();
+		
+		switch (type) {
+		case 1://单步进电机
+			initMotorDriver(dirPin, pulPin, gpio);
+			break;
+		case 2://继电器电机
+			intiRelayDriver(beforePin, backPin, gpio);
+			break;
+		case 3://步进电机+继电器点击（小车）
+			initMotorDriver(dirPin, pulPin, gpio);
+			intiRelayDriver(beforePin, backPin, gpio);
+			break;
+		default:
+			break;
+		}
+		//初始化停止开关
+		initAccess(accesses, gpio);
+	}
+	
+	private GpioPinListenerDigital getMotorStopListener(final Integer openStatus){
 		GpioPinListenerDigital stopListener = new GpioPinListenerDigital() {
 
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-				if(accessType==2){
+				if(openStatus==2){
 					if (event.getState().isHigh()) {
-						if(running){
-							running = false;
+						if(motorRunning){
+							motorRunning = false;
 						}
 					}
-				}else if(accessType==1){
+				}else if(openStatus==1){
 					if (event.getState().isLow()) {
-						if(running){
-							running = false;
+						if(motorRunning){
+							motorRunning = false;
 						}
 					}
 				}
@@ -100,30 +150,121 @@ public class MotorDriver {
 	}
 	
 	
-	private GpioPinListenerDigital getBackListener(final Long delayTime){
+	private GpioPinListenerDigital getMotorBackListener(final Long delayTime,final Integer openStatus){
 		GpioPinListenerDigital backListener = new GpioPinListenerDigital() {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-				if (event.getState().isHigh()) {
-					if(running){
-						running = false;
-						try {
-							Thread.sleep(delayTime);
-							if(pin_dir.isHigh()){
-								pin_dir.setState(PinState.LOW);
-							}else{
-								pin_dir.setState(PinState.HIGH);
-							}
-							running = true;
-							move();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+				
+				if(openStatus==2){
+					if (event.getState().isHigh()) {
+						motorBack(delayTime);
+					}
+				}else if(openStatus==1){
+					if (event.getState().isLow()) {
+						motorBack(delayTime);
 					}
 				}
 			}
 		};
 		return backListener;
+	}
+	
+	/**
+	 * 步进点击反向运动
+	 * @param delayTime
+	 */
+	private void motorBack(Long delayTime){
+		if(motorRunning){
+			motorRunning = false;
+			try {
+				Thread.sleep(delayTime);
+				if(pin_dir.isHigh()){
+					pin_dir.setState(PinState.LOW);
+				}else{
+					pin_dir.setState(PinState.HIGH);
+				}
+				motorRunning = true;
+				motorStart();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private GpioPinListenerDigital getRelayStopListener(final Integer openStatus){
+		GpioPinListenerDigital stopListener = new GpioPinListenerDigital() {
+
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				if(openStatus==2){
+					if (event.getState().isHigh()) {
+						stopRelay();
+					}
+				}else if(openStatus==1){
+					if (event.getState().isLow()) {
+						stopRelay();
+					}
+				}
+			}
+
+		};
+		return stopListener;
+	}
+	
+	
+	private GpioPinListenerDigital getRelayBackListener(final Long backDelay,final Integer openStatus){
+		GpioPinListenerDigital backListener = new GpioPinListenerDigital() {
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				
+				if(openStatus==2){
+					if (event.getState().isHigh()) {
+						backRelay(backDelay);
+					}
+				}else if(openStatus==1){
+					if (event.getState().isLow()) {
+						backRelay(backDelay);
+					}
+				}
+			}
+		};
+		return backListener;
+	}
+	
+	/**
+	 * 继电器电机停止
+	 */
+	private void stopRelay(){
+		if(relayDirection==0){//正向
+			pin_before.setState(PinState.HIGH);
+		}else{
+			pin_back.setState(PinState.HIGH);
+		}
+		//保障一下，都停
+		pin_before.setState(PinState.HIGH);
+		pin_back.setState(PinState.HIGH);
+	}
+	
+	/**
+	 * 继电器电机反向运动
+	 * @param backDelay
+	 */
+	private void backRelay(Long backDelay){
+		stopRelay();
+		try {
+			Thread.sleep(backDelay);
+			if(relayDirection==0){
+				//原属性是正向，本次就是反向，并更新属性
+				pin_back.setState(PinState.LOW);
+				relayDirection=1;
+			}else{
+				//原属性是反向，本次就是正向，并更新属性
+				pin_before.setState(PinState.LOW);
+				relayDirection=0;
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// private GpioPinListenerAnalog pinListener = new GpioPinListenerAnalog() {
@@ -138,10 +279,63 @@ public class MotorDriver {
 	// }
 	// };
 
-	public MotorDriver() {
+	
+	
+	/**
+	 * 初始化步进电机
+	 * @param dirPin
+	 * @param pulPin
+	 * @param gpio
+	 */
+	private void initMotorDriver(Integer dirPin,Integer pulPin,final GpioController gpio){
+		pin_dir = gpio.provisionDigitalOutputPin(getGPIONum(dirPin), "dirPin", PinState.HIGH);
+		pin_pul = gpio.provisionDigitalOutputPin(getGPIONum(pulPin), "pulPin", PinState.HIGH);
+		pin_dir.setShutdownOptions(true, PinState.LOW);
+		pin_pul.setShutdownOptions(true, PinState.LOW);
 	}
 	
+	/**
+	 * 初始化继电器电机
+	 * @param beforePin
+	 * @param backPin
+	 * @param gpio
+	 */
+	private void intiRelayDriver(Integer beforePin,Integer backPin,final GpioController gpio){
+		pin_before = gpio.provisionDigitalOutputPin(getGPIONum(beforePin), "beforePin", PinState.HIGH);
+		pin_back = gpio.provisionDigitalOutputPin(getGPIONum(backPin), "backPin", PinState.HIGH);
+		pin_before.setShutdownOptions(true, PinState.LOW);
+		pin_back.setShutdownOptions(true, PinState.LOW);
+	}
 	
+	/**
+	 * 初始化停止开关
+	 * @param accesses
+	 * @param type
+	 * @param gpio
+	 */
+	private void initAccess(List<Access> accesses,final GpioController gpio){
+		for(Access access : accesses){
+			GpioPinDigitalInput stopPin = gpio.provisionDigitalInputPin(getGPIONum(access.getPinNum()));
+			switch (access.getType()) {
+			case 1:
+				stopPin.addListener(getMotorStopListener(access.getOpenStatus()));
+				break;
+			case 2:
+				stopPin.addListener(getMotorBackListener(access.getBackDelay(),access.getOpenStatus()));
+				break;
+			case 3:
+				stopPin.addListener(getRelayStopListener(access.getOpenStatus()));
+				break;
+			case 4:
+				stopPin.addListener(getRelayBackListener(access.getBackDelay(),access.getOpenStatus()));
+				break;
+
+			default:
+				break;
+			}
+			
+		}
+	}
 	
 //
 //	public MotorDriver(Integer dirPin, Integer pulPin, Integer motorNum, Integer backPin, Integer stopPin,
@@ -166,14 +360,17 @@ public class MotorDriver {
 //
 //	}
 
-	// 设置马达转动方向
-	public void setDirection(Integer direction) {
-		this.direction = direction;
+	/**
+	 * 设置步进电机转动方向，手动直接改变。
+	 * @param motorDirection
+	 */
+	public void setMotorRunningDirection(Integer motorDirection) {
+		this.motorDirection = motorDirection;
 		pin_pul.setState(PinState.LOW);
-		if (direction == FORWARD) {
+		if (motorDirection == FORWARD) {
 			// System.out.println("马达编号【"+this.motorNum+"】设置方向---low："+FORWARD);
 			pin_dir.low();
-		} else if (direction == BACKWARD) {
+		} else if (motorDirection == BACKWARD) {
 			// System.out.println("马达编号【"+this.motorNum+"】设置方向---high："+BACKWARD);
 			pin_dir.high();
 		}
@@ -216,26 +413,30 @@ public class MotorDriver {
 //
 //	}
 
-	public void moveThread() {
-		if (this.direction == null) {
-			System.out.println("没有设置方向！");
-			return;
-		}
-		if (this.interval == null) {
-			System.out.println("没有设置转速！");
-			return;
-		}
-
-//		if (!controlThread.isAlive()) {
-//			controlThread = new GpioStepperMotorControl();
-//			controlThread.start();
+//	public void moveThread() {
+//		if (this.direction == null) {
+//			System.out.println("没有设置方向！");
+//			return;
 //		}
-	}
+//		if (this.interval == null) {
+//			System.out.println("没有设置转速！");
+//			return;
+//		}
+//
+////		if (!controlThread.isAlive()) {
+////			controlThread = new GpioStepperMotorControl();
+////			controlThread.start();
+////		}
+//	}
 
 	// 转动
-	public void move() throws InterruptedException {
+	/**
+	 * 步进电机开始启动
+	 * @throws InterruptedException
+	 */
+	public void motorStart() throws InterruptedException {
 		try {
-			if (direction == null) {
+			if (motorDirection == null) {
 				System.out.println("没有设置方向！");
 				return;
 			}
@@ -259,7 +460,7 @@ public class MotorDriver {
 				}
 			}
 			long time = System.nanoTime();
-			while (running) {
+			while (motorRunning) {
 				long tmp = System.nanoTime();
 				if (tmp - time > (35000+interval*10000)) {
 					if (pin_pul.isHigh()) {
@@ -276,8 +477,38 @@ public class MotorDriver {
 		}
 	}
 
+	/**
+	 * 继电器靶机 正转
+	 */
+	public void relayStart(){
+		pin_back.setState(PinState.HIGH);
+		pin_before.setState(PinState.LOW);
+	}
+	
+	/**
+	 * 继电器靶机反转
+	 */
+	public void relayBack(){
+		pin_before.setState(PinState.HIGH);
+		pin_back.setState(PinState.LOW);
+	}
+	
+	/**
+	 * 继电器靶机停止
+	 */
+	public void relayStop(){
+		pin_before.setState(PinState.HIGH);
+		pin_back.setState(PinState.HIGH);
+	}
+	
+	/**
+	 * 按照圈数旋转，方法暂时没有用
+	 * @param fen
+	 * @throws InterruptedException
+	 */
+	@Deprecated
 	public void moveCycle(Integer fen) throws InterruptedException {
-		if (this.direction == null) {
+		if (this.motorDirection == null) {
 			System.out.println("没有设置方向！");
 			return;
 		}
@@ -424,10 +655,6 @@ public class MotorDriver {
 		this.motorNum = motorNum;
 	}
 
-	public Integer getDirection() {
-		return direction;
-	}
-
 	public Integer getInterval() {
 		return interval;
 	}
@@ -436,11 +663,51 @@ public class MotorDriver {
 		this.interval = interval;
 	}
 
-	public void setRunning(Boolean running) {
-		this.running = running;
+
+	public Integer getMotorDirection() {
+		return motorDirection;
 	}
 
-	public Boolean getRunning() {
-		return running;
+
+	public void setMotorDirection(Integer motorDirection) {
+		this.motorDirection = motorDirection;
 	}
+
+
+	public Integer getRelayDirection() {
+		return relayDirection;
+	}
+
+
+	public void setRelayDirection(Integer relayDirection) {
+		this.relayDirection = relayDirection;
+	}
+
+
+	public Boolean getMotorRunning() {
+		return motorRunning;
+	}
+
+
+	public void setMotorRunning(Boolean motorRunning) {
+		this.motorRunning = motorRunning;
+	}
+
+
+	public Boolean getRelayRunning() {
+		return relayRunning;
+	}
+
+
+	public void setRelayRunning(Boolean relayRunning) {
+		this.relayRunning = relayRunning;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	
 }

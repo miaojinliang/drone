@@ -32,7 +32,12 @@ public class Drone {
 	private String backButton;//定义反向按钮的名称
 	private String stopButton;//定义暂停按钮的名称
 	
-
+	private String rotateStart;//定义移动小车靶开始旋转按钮名称
+	private String rotateBack;//定义移动小车靶返回旋转按钮名称
+	private String rotateStop;//定义移动小车靶停止旋转按钮名称
+	
+	private RaspClient raspClient;//所属控制器
+	
 	public Integer getId() {
 		return id;
 	}
@@ -151,6 +156,38 @@ public class Drone {
 
 	public void setStopButton(String stopButton) {
 		this.stopButton = stopButton;
+	}
+
+	public String getRotateStart() {
+		return rotateStart;
+	}
+
+	public void setRotateStart(String rotateStart) {
+		this.rotateStart = rotateStart;
+	}
+
+	public String getRotateBack() {
+		return rotateBack;
+	}
+
+	public void setRotateBack(String rotateBack) {
+		this.rotateBack = rotateBack;
+	}
+
+	public String getRotateStop() {
+		return rotateStop;
+	}
+
+	public void setRotateStop(String rotateStop) {
+		this.rotateStop = rotateStop;
+	}
+
+	public RaspClient getRaspClient() {
+		return raspClient;
+	}
+
+	public void setRaspClient(RaspClient raspClient) {
+		this.raspClient = raspClient;
 	}
 	
 }

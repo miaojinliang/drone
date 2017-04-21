@@ -66,10 +66,14 @@ var getFormValues = function(){
 	var startButton = $('#startButton').val();
 	var backButton = $('#backButton').val();
 	var stopButton = $('#stopButton').val();
+	var rotateStart = $('#rotateStart').val();
+	var rotateBack = $('#rotateBack').val();
+	var rotateStop = $('#rotateStop').val();
 	
 	return {type:droneType,name:droneName,seq:droneSeq,startDelay:startDelay,dirPin:dirPin,
 		pulPin:pulPin,interval:interval,beforePin:beforePin,backPin:backPin,
-		rotateDelay:rotateDelay,startButton:startButton,backButton:backButton,stopButton:stopButton};
+		rotateDelay:rotateDelay,startButton:startButton,backButton:backButton,stopButton:stopButton,
+		rotateStart:rotateStart,rotateBack:rotateBack,rotateStop:rotateStop};
 };
 
 var saveDrone = function(){

@@ -12,6 +12,7 @@ public class Access {
 	private Long backDelay;//返回时间(秒)
 	private Integer droneId;//匹配电机
 	private Integer openStatus;//开关常开类型：1：高电平常开（低电平触发动作）；2：低电平常开（高电平触发动作）
+	private Integer pinNum;//pin针脚
 	
 	public Integer getId() {
 		return id;
@@ -49,6 +50,11 @@ public class Access {
 	public void setOpenStatus(Integer openStatus) {
 		this.openStatus = openStatus;
 	}
-	
+	public void setPinNum(Integer pinNum) {
+		this.pinNum = pinNum;
+	}
+	public Integer getPinNum() {
+		return pinNum;
+	}
 	
 }

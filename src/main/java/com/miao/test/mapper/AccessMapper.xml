@@ -8,10 +8,11 @@
     <result column="back_delay" property="backDelay" jdbcType="INTEGER" />
     <result column="drone_id" property="droneId" jdbcType="INTEGER" />
     <result column="open_status" property="openStatus" jdbcType="INTEGER" />
+    <result column="pin_num" property="pinNum" jdbcType="INTEGER" />
   </resultMap>
   
   <sql id="Base_Column_List" >
-    id,name,type,back_delay,drone_id,open_status
+    id,name,type,back_delay,drone_id,open_status,pin_num
   </sql>
   
   <select id="getAccessByDronId" resultType="com.miao.test.bean.Access" >
@@ -19,8 +20,8 @@
   </select>
   
   <insert id="insertAccessForDrone" parameterType="com.miao.test.bean.Access">
-  	INSERT INTO access (name,type,back_delay,drone_id,open_status) 
-  	VALUES (#{name},#{type},#{backDelay},#{droneId},#{openStatus})
+  	INSERT INTO access (name,type,back_delay,drone_id,open_status,pin_num) 
+  	VALUES (#{name},#{type},#{backDelay},#{droneId},#{openStatus},#{pinNum})
   </insert>
   
   <delete id="deleteAccess" parameterType="java.lang.Integer">
@@ -33,7 +34,8 @@
   	type = #{type}, 
   	back_delay=#{backDelay}, 
   <!-- 	drone_id=#{droneId},  -->
-  	open_status=#{openStatus} 
+  	open_status=#{openStatus},
+  	pin_num = #{pinNum}
   	WHERE id = #{id}
   </update>
   

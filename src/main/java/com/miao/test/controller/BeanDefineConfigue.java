@@ -2,15 +2,18 @@ package com.miao.test.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import com.alibaba.fastjson.JSONObject;
+import com.miao.test.bean.Access;
+import com.miao.test.bean.Drone;
 import com.miao.test.common.CommonCore;
-import com.miao.test.driver.MotorBean;
-import com.miao.test.driver.MotorDriver;
+import com.miao.test.driver.DroneDriver;
 import com.miao.test.driver.RelayDriver;
+import com.miao.test.service.AccessService;
+import com.miao.test.service.DroneService;
 
 
 public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedEvent>{
@@ -20,11 +23,26 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 	private String motorDrivers;
 	
 	
+	@Autowired
+	private DroneService droneService;
+	
+	@Autowired
+	private AccessService accessService;
+	
+	
 	//当一个ApplicationContext被初始化或刷新触发
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		//root application context 没有parent，他就是老大，这里避免执行多次，只执行一次初始化就够了。
 		if(event.getApplicationContext().getParent()==null){
+			
+			List<Drone> drones = droneService.getDrones();
+			for(Drone drone : drones){
+				//初始化点击驱动
+//				initDroneDrivers(drone);
+				CommonCore.drones.add(drone);
+			}
+			
 //			System.out.println("spring初始化是执行一次");
 //			
 //			System.out.println(motorDrivers);
@@ -37,19 +55,24 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 	}
 	
 	
-	public void initMotorDrivers(List<MotorBean> motorBeans){
-		for(MotorBean mb : motorBeans){
-			Integer motorNum = mb.getMotorNum();
-			Integer motorDirPin = mb.getDirPin();
-			Integer motorPulPin = mb.getPulPin();
-			Integer motorBackPin = mb.getBackPin();
-			Integer motorStopPin = mb.getStopPin();
-			Long delayTime = mb.getDelayTime();
-			
-//			MotorDriver md = new MotorDriver(motorDirPin, motorPulPin, motorNum,motorBackPin,motorStopPin,delayTime);
-			MotorDriver md = new MotorDriver();
-			CommonCore.motorDrivers.add(md);
-		}
+	public void initDroneDrivers(Drone drone){
+		List<Access> accesses = accessService.getAccessByDronId(drone.getId());
+		DroneDriver dd = new DroneDriver(drone.getId(), drone.getType(),
+				drone.getStartDelay(), drone.getDirPin(), drone.getPulPin(),
+				drone.getInterval(), drone.getBeforePin(), drone.getBackPin(), drone.getRotateDelay(), accesses);
+		CommonCore.motorDrivers.add(dd);
+//		for(MotorBean mb : motorBeans){
+//			Integer motorNum = mb.getMotorNum();
+//			Integer motorDirPin = mb.getDirPin();
+//			Integer motorPulPin = mb.getPulPin();
+//			Integer motorBackPin = mb.getBackPin();
+//			Integer motorStopPin = mb.getStopPin();
+//			Long delayTime = mb.getDelayTime();
+//			
+////			MotorDriver md = new MotorDriver(motorDirPin, motorPulPin, motorNum,motorBackPin,motorStopPin,delayTime);
+//			DroneDriver md = new DroneDriver();
+//			CommonCore.motorDrivers.add(md);
+//		}
 	}
 	
 	public void initRelayDriver(){

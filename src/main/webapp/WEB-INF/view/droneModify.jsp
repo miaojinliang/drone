@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>控制台</title>
+<title>修改电机配置</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="common/jqueryMobile/jquery.mobile-1.4.5.css">
 <script src="common/jqueryMobile/jquery.min.js"></script>
@@ -81,6 +81,16 @@ tr:nth-child(even) {
        	<div id="m_type3" data-role="fieldcontain">
         	<label for="m_rotateDelay">旋转延迟(秒)：</label>
         	<input type="text" name="rotateDelay" id="m_rotateDelay" value="${drone.rotateDelay}">
+        	
+        	<label for="m_rotateStart">开始旋转按钮：</label>
+        	<input type="text" name="rotateStart" id="m_rotateStart" value="${drone.rotateStart}">
+        	
+        	<label for="m_rotateBack">反向旋转按钮：</label>
+        	<input type="text" name="rotateBack" id="m_rotateBack" value="${drone.rotateBack}">
+        	
+        	<label for="m_rotateStop">停止旋转按钮：</label>
+        	<input type="text" name="rotateStop" id="m_rotateStop" value="${drone.rotateStop}">
+        	
        	</div>
         	
         	

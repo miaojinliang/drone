@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>控制台</title>
+<title>系统设置</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="common/jqueryMobile/jquery.mobile-1.4.5.css">
 <script src="common/jqueryMobile/jquery.min.js"></script>
@@ -21,11 +21,30 @@ tr:nth-child(even) {
     background: #e9e9e9;
 }
 </style>
+
+<script type="text/javascript">
+var jumpBack = function(fromUrl){
+	//alert("http://"+ip+"/"+port+"/drone/settingWithUrl?url=");
+	window.location.href = fromUrl;
+	
+}
+
+var jumpRasp = function(ip,port){
+	//alert("http://"+ip+"/"+port+"/drone/settingWithUrl?url=");
+	//window.location.href = "http://"+ip+":"+port+"/drone/settingWithUrl?url="+window.location.href;
+	$('#jumpRaspForm').prop("action","http://"+ip+":"+port+"/drone/settingWithUrl");
+	$('#backUrl').val(window.location.href);
+	$('#jumpRaspForm').submit();
+}
+</script>
 </head>
 <body>
 
 <div data-role="page" id="mainPage">
   <div data-role="header">
+  <c:if test="${fromUrl!=null }">
+  	<a data-transition="pop" onclick="jumpBack('${fromUrl}');" class="ui-btn ui-corner-all ui-shadow ui-icon-back ui-btn-icon-left">返回</a>
+  </c:if>
     <h1>靶机列表</h1>
     <a href="#addPage"  data-transition="pop" class="ui-btn ui-btn-right ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left">添加靶机</a>
   </div>
@@ -46,6 +65,9 @@ tr:nth-child(even) {
           <th data-priority="6">开始按钮</th>
           <th data-priority="6">返回按钮</th>
           <th data-priority="6">停止按钮</th>
+          <th data-priority="6">开始旋转按钮</th>
+          <th data-priority="6">返回旋转按钮</th>
+          <th data-priority="6">停止旋转按钮</th>
           <th data-priority="1">操作</th>
           <th data-priority="1">开关管理</th>
         </tr>
@@ -84,6 +106,9 @@ tr:nth-child(even) {
           <td>${ drone.startButton}</td>
           <td>${ drone.backButton}</td>
           <td>${ drone.stopButton}</td>
+          <td>${ drone.rotateStart}</td>
+          <td>${ drone.rotateBack}</td>
+          <td>${ drone.rotateStop}</td>
           <td><a href = "${ctx }/droneModify?id=${drone.id}"  data-transition="pop" >修改</a>&nbsp;
           |&nbsp;&nbsp;<a href = "${ctx }/deleteDrone?id=${drone.id}" onclick="return confirm('确定删除?');">删除</a></td>
           <td><a href = "${ctx }/getAccesses?droneId=${drone.id}" >管理</a></td>
@@ -102,6 +127,9 @@ tr:nth-child(even) {
 	      	<input type="range" name="points" id="points" value="5" min="1" max="9" data-popup-enabled="true">
       </div> -->
 	</div>
+	<div data-role="footer" style="text-align:center;">
+    <a href="${ctx }/rasp" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left">控制器设置</a>
+  </div>
 </div>
 
 	<div data-role="page" id="addPage">
@@ -164,6 +192,15 @@ tr:nth-child(even) {
        	<div id="type3" data-role="fieldcontain">
         	<label for="rotateDelay">旋转延迟(秒)：</label>
         	<input type="text" name="rotateDelay" id="rotateDelay">
+        	
+        	<label for="rotateStart">开始旋转按钮：</label>
+        	<input type="text" name="rotateStart" id="rotateStart" value="正向旋转">
+        	
+        	<label for="rotateBack">反向旋转按钮：</label>
+        	<input type="text" name="rotateBack" id="rotateBack" value="反向旋转">
+        	
+        	<label for="rotateStop">停止旋转按钮：</label>
+        	<input type="text" name="rotateStop" id="rotateStop" value="停止旋转">
        	</div>
         	
         	
