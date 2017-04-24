@@ -4,22 +4,15 @@ package com.miao.test.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.miao.test.bean.Drone;
 import com.miao.test.common.CommonCore;
 import com.miao.test.driver.DroneDriver;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
+import com.miao.test.service.DroneService;
 
 @Controller
 public class MotorController {
@@ -30,10 +23,40 @@ public class MotorController {
 		return CommonCore.motorDrivers;
 	}
 	
+	
+	@Autowired
+	private DroneService droneService;
+	
+	
+	
 	@RequestMapping(value = "/motorMove")
 	@ResponseBody
 	public void motorMove(@RequestParam("droneId") Integer droneId,@RequestParam("moveType") String moveType) throws InterruptedException{
 		System.out.println("motorMove"+"----droneId:"+droneId+"---"+moveType);
+		
+		Drone drone = droneService.getById(droneId);
+		DroneDriver droneDriver = null;
+		for(DroneDriver md : CommonCore.motorDrivers){
+			if(md.getMotorNum()==droneId){
+				droneDriver = md;
+			}
+		}
+		
+		switch (drone.getType()) {
+		case 1:
+			
+			break;
+		case 2:
+			
+			break;
+		case 3:
+	
+			break;
+
+		default:
+			break;
+		}
+		
 //		Integer direction=0;
 //		switch (moveType) {
 //		case "START":
@@ -62,6 +85,8 @@ public class MotorController {
 //				}
 //			}
 	}
+	
+	
 	
 //	@RequestMapping(value = "/motorMove")
 //	@ResponseBody
