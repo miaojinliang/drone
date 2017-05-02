@@ -72,6 +72,37 @@ public class DroneController {
 		}
 	}
 	
+	@RequestMapping(value = "/rotateMove")
+	@ResponseBody
+	public void rotateMove(@RequestParam("droneId") Integer droneId,@RequestParam("raspId") Integer raspId,@RequestParam("moveType") String moveType) throws InterruptedException{
+		try {
+			RaspClient rasp = raspService.getRaspById(raspId);
+			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"/motorRotate";
+			Map<String, Object>  params = new HashMap<String, Object>();
+			params.put("droneId",droneId);
+			params.put("moveType", moveType);
+			HttpUtil.doPost(raspAddr, params);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "/changeInterval")
+	@ResponseBody
+	public void changeInterval(@RequestParam("droneId") Integer droneId,@RequestParam("raspId") Integer raspId,@RequestParam("value") Integer value) throws InterruptedException{
+		try {
+			RaspClient rasp = raspService.getRaspById(raspId);
+			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"/motorChangeInterval";
+			Map<String, Object>  params = new HashMap<String, Object>();
+			params.put("droneId",droneId);
+			params.put("value", value);
+			HttpUtil.doPost(raspAddr, params);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 	
 	

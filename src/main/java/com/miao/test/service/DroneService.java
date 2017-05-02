@@ -12,4 +12,6 @@ public interface DroneService {
 	void deleteDrone(Integer id);
 	void updateDrone(Drone drone);
 	Drone getById(Integer id);
+	
+	void updateInterval(Integer id,Integer interval);
 }

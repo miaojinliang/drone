@@ -64,4 +64,10 @@
   <select id="getById" resultMap="BaseResultMap">
   	SELECT * FROM drone WHERE id = #{id}
   </select>
+  
+  <update id="updateInterval">
+  	UPDATE drone SET interval=#{interval} WHERE id = #{id}
+  </update>
+  
+  
 </mapper>

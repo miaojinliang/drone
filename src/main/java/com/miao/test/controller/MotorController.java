@@ -32,7 +32,7 @@ public class MotorController {
 	@RequestMapping(value = "/motorMove")
 	@ResponseBody
 	public void motorMove(@RequestParam("droneId") Integer droneId,@RequestParam("moveType") String moveType) throws InterruptedException{
-		System.out.println("motorMove"+"----droneId:"+droneId+"---"+moveType);
+//		System.out.println("motorMove"+"----droneId:"+droneId+"---"+moveType);
 		
 		Drone drone = droneService.getById(droneId);
 		DroneDriver droneDriver = null;
@@ -43,14 +43,60 @@ public class MotorController {
 		}
 		
 		switch (drone.getType()) {
-		case 1:
-			
+		case 1://步进电机
+			if("START".equals(moveType)){//开始
+				if(!droneDriver.getMotorRunning()){
+					droneDriver.setMotorRunningDirection(0);//设置转动方向
+					droneDriver.setMotorRunning(true);//设置开始运行状态
+					//设置运行方向
+					droneDriver.motorStart();
+				}else{
+					droneDriver.setMotorRunningDirection(0);//设置转动方向
+				}
+			}else if("STOP".equals(moveType)){//暂停
+				droneDriver.setMotorRunning(false);//停止运动
+			}else if("BACK".equals(moveType)){//返回
+				if(!droneDriver.getMotorRunning()){
+					droneDriver.setMotorRunningDirection(1);//设置转动方向
+					droneDriver.setMotorRunning(true);//设置开始运行状态
+					//设置运行方向
+					droneDriver.motorStart();
+				}else{
+					droneDriver.setMotorRunningDirection(1);//设置转动方向
+				}
+			}
 			break;
-		case 2:
-			
+		case 2://继电器电机
+			if("START".equals(moveType)){//开始
+				droneDriver.relayStart();
+			}else if("STOP".equals(moveType)){//暂停
+				droneDriver.relayStop();
+			}else if("BACK".equals(moveType)){//返回
+				droneDriver.relayStart();
+			}
 			break;
-		case 3:
-	
+		case 3://步进点击+继电器点击
+			if("START".equals(moveType)){//开始
+				if(!droneDriver.getMotorRunning()){
+					droneDriver.setMotorRunningDirection(0);//设置转动方向
+					droneDriver.setMotorRunning(true);//设置开始运行状态
+					//设置运行方向
+					droneDriver.motorStart();
+				}else{
+					droneDriver.setMotorRunningDirection(0);//设置转动方向
+				}
+			}else if("STOP".equals(moveType)){//暂停
+				droneDriver.setMotorRunning(false);//停止运动
+			}else if("BACK".equals(moveType)){//返回
+				if(!droneDriver.getMotorRunning()){
+					droneDriver.setMotorRunningDirection(1);//设置转动方向
+					droneDriver.setMotorRunning(true);//设置开始运行状态
+					//设置运行方向
+					droneDriver.motorStart();
+				}else{
+					droneDriver.setMotorRunningDirection(1);//设置转动方向
+				}
+			}
 			break;
 
 		default:
@@ -87,6 +133,49 @@ public class MotorController {
 	}
 	
 	
+	
+	
+	@RequestMapping(value = "/motorRotate")
+	@ResponseBody
+	public void motorRotate(@RequestParam("droneId") Integer droneId,@RequestParam("moveType") String moveType) throws InterruptedException{
+//		System.out.println(droneId+"---------------"+moveType);
+		Drone drone = droneService.getById(droneId);
+		DroneDriver droneDriver = null;
+		for(DroneDriver md : CommonCore.motorDrivers){
+			if(md.getMotorNum()==droneId){
+				droneDriver = md;
+			}
+		}
+		if(drone.getType()==3){
+			if("START".equals(moveType)){//开始
+				droneDriver.relayStart();
+			}else if("STOP".equals(moveType)){//暂停
+				droneDriver.relayStop();
+			}else if("BACK".equals(moveType)){//返回
+				droneDriver.relayStart();
+			}
+		}
+	}
+	
+	
+	@RequestMapping(value = "/motorChangeInterval")
+	@ResponseBody
+	public void motorChangeInterval(@RequestParam("droneId") Integer droneId,@RequestParam("value") Integer value) throws InterruptedException{
+		System.out.println(droneId+"---------------"+(10-value));
+		for(DroneDriver md : CommonCore.motorDrivers){
+			if(md.getMotorNum()==droneId){
+				md.setInterval(10-value);
+			}
+		}
+		
+		for(Drone drone : CommonCore.drones){
+			if(drone.getId()==droneId){
+				drone.setInterval(value);
+				droneService.updateInterval(droneId, value);
+			}
+		}
+		
+	}
 	
 //	@RequestMapping(value = "/motorMove")
 //	@ResponseBody

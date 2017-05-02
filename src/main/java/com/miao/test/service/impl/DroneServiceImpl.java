@@ -39,4 +39,9 @@ public class DroneServiceImpl implements DroneService {
 	public Drone getById(Integer id) {
 		return droneMapper.getById(id);
 	}
+
+	@Override
+	public void updateInterval(Integer id, Integer interval) {
+		droneMapper.updateInterval(id, interval);
+	}
 }
