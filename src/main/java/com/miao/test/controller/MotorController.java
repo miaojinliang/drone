@@ -152,7 +152,7 @@ public class MotorController {
 			}else if("STOP".equals(moveType)){//暂停
 				droneDriver.relayStop();
 			}else if("BACK".equals(moveType)){//返回
-				droneDriver.relayStart();
+				droneDriver.relayBack();
 			}
 		}
 	}

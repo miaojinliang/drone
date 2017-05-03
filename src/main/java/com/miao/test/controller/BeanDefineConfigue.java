@@ -39,7 +39,7 @@ public class BeanDefineConfigue implements ApplicationListener<ContextRefreshedE
 			List<Drone> drones = droneService.getDrones();
 			for(Drone drone : drones){
 				//初始化点击驱动
-//				initDroneDrivers(drone);
+				initDroneDrivers(drone);
 				CommonCore.drones.add(drone);
 			}
 			

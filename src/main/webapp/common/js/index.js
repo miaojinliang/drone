@@ -3,7 +3,7 @@ var droneMove = function(droneId,raspId,moveType){
 //	console.log(droneId+"---"+raspId+"---"+moveType);
 	$.ajax({
 		type : 'post',
-		url : 'motorMove',
+		url : 'droneMove',
 		data : {
 			droneId : droneId,
 			raspId:raspId,

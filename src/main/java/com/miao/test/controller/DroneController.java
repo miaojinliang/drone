@@ -41,8 +41,9 @@ public class DroneController {
 		try{
 			List<RaspClient> raspClients = raspService.getRaspclients();
 			for(RaspClient rasp : raspClients){
-				String url = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"getDrones";
-					String body = HttpUtil.doGet(url, null);
+				String url = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+(rasp.getAppName()==null?"":rasp.getAppName())+"getDrones";
+					System.out.println(url);
+				String body = HttpUtil.doGet(url, null);
 					List<Drone> raspDrones = JSON.parseArray(body, Drone.class);
 					for(Drone drone : raspDrones){
 						drone.setRaspClient(rasp);
@@ -62,7 +63,8 @@ public class DroneController {
 	public void droneMove(@RequestParam("droneId") Integer droneId,@RequestParam("raspId") Integer raspId,@RequestParam("moveType") String moveType) throws InterruptedException{
 		try {
 			RaspClient rasp = raspService.getRaspById(raspId);
-			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"/motorMove";
+			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+(rasp.getAppName()==null?"":rasp.getAppName())+"/motorMove";
+			System.out.println(raspAddr);
 			Map<String, Object>  params = new HashMap<String, Object>();
 			params.put("droneId",droneId);
 			params.put("moveType", moveType);
@@ -77,7 +79,7 @@ public class DroneController {
 	public void rotateMove(@RequestParam("droneId") Integer droneId,@RequestParam("raspId") Integer raspId,@RequestParam("moveType") String moveType) throws InterruptedException{
 		try {
 			RaspClient rasp = raspService.getRaspById(raspId);
-			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"/motorRotate";
+			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+(rasp.getAppName()==null?"":rasp.getAppName())+"/motorRotate";
 			Map<String, Object>  params = new HashMap<String, Object>();
 			params.put("droneId",droneId);
 			params.put("moveType", moveType);
@@ -92,7 +94,7 @@ public class DroneController {
 	public void changeInterval(@RequestParam("droneId") Integer droneId,@RequestParam("raspId") Integer raspId,@RequestParam("value") Integer value) throws InterruptedException{
 		try {
 			RaspClient rasp = raspService.getRaspById(raspId);
-			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+rasp.getAppName()+"/motorChangeInterval";
+			String raspAddr = "http://"+rasp.getIp()+":"+rasp.getPort()+"/"+(rasp.getAppName()==null?"":rasp.getAppName())+"/motorChangeInterval";
 			Map<String, Object>  params = new HashMap<String, Object>();
 			params.put("droneId",droneId);
 			params.put("value", value);

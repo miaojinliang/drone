@@ -198,11 +198,13 @@ public class DroneDriver {
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
 				if(openStatus==2){
 					if (event.getState().isHigh()) {
-						stopRelay();
+//						stopRelay();
+						relayStop();
 					}
 				}else if(openStatus==1){
 					if (event.getState().isLow()) {
-						stopRelay();
+//						stopRelay();
+						relayStop();
 					}
 				}
 			}
@@ -250,7 +252,7 @@ public class DroneDriver {
 	 * @param backDelay
 	 */
 	private void backRelay(Long backDelay){
-		stopRelay();
+		relayStop();
 		try {
 			Thread.sleep(backDelay);
 			if(relayDirection==0){
