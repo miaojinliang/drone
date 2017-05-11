@@ -43,3 +43,17 @@ create table raspclient(
 	[app_name]		varchar(50),
 	[remark]		varchar(200)
 );
+
+create table auto_plan(
+	[id]			integer PRIMARY KEY autoincrement,
+	[name]			varchar(50),
+	[create_time]	datetime,
+	[remark]		varchar(200)
+);
+
+create table plan_detail(
+	[id]			integer PRIMARY KEY autoincrement,
+	[drone_id]		integer,
+	[rasp_id]		integer,
+	[sort_num]		integer		
+);

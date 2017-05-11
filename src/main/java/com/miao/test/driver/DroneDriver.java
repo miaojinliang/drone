@@ -236,16 +236,16 @@ public class DroneDriver {
 	/**
 	 * 继电器电机停止
 	 */
-	private void stopRelay(){
-		if(relayDirection==0){//正向
-			pin_before.setState(PinState.HIGH);
-		}else{
-			pin_back.setState(PinState.HIGH);
-		}
-		//保障一下，都停
-		pin_before.setState(PinState.HIGH);
-		pin_back.setState(PinState.HIGH);
-	}
+//	private void stopRelay(){
+//		if(relayDirection==0){//正向
+//			pin_before.setState(PinState.HIGH);
+//		}else{
+//			pin_back.setState(PinState.HIGH);
+//		}
+//		//保障一下，都停
+//		pin_before.setState(PinState.HIGH);
+//		pin_back.setState(PinState.HIGH);
+//	}
 	
 	/**
 	 * 继电器电机反向运动

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.miao.test.mapper.AutoPlanMapper" >
+  <resultMap id="BaseResultMap" type="com.miao.test.bean.AutoPlan" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="DATETIME" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id,name,create_time,remark
+  </sql>
+  
+  <insert id="insertAutoPlan">
+  	INSERT INTO auto_plan (name,create_time,remark) 
+  	VALUES (#{name},#{createTime},#{remark})
+  </insert>
+  
+  <delete id="deleteAutoPlan" parameterType="java.lang.Integer">
+  	DELETE FROM auto_plan WHERE id = #{id}
+  </delete>
+  
+  <select id="getAutoPlans" resultType="com.miao.test.bean.AutoPlan">
+  	SELECT * FROM auto_plan;
+  </select>
+  
+  <select id="getById" resultType="com.miao.test.bean.RaspClient">
+  	SELECT * FROM raspclient WHERE id = #{id}
+  </select>
+</mapper>

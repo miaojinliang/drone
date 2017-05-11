@@ -1,25 +1,11 @@
 package com.miao.test.controller;
 
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.miao.test.common.CommonCore;
-import com.miao.test.driver.DroneDriver;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
 
 @Controller
 @RequestMapping("/testController")
@@ -30,15 +16,14 @@ public class TestController {
 	private CacheManager cacheManager;
 	
 	private List<MotorDriver> md=null;
-	
-	@RequestMapping(value = "/addMotors")
+	*/
+	@RequestMapping(value = "/testJ",method=RequestMethod.POST)
 	@ResponseBody
-	public void addMotors(@RequestParam("dirPin") Integer dirPin,
-			@RequestParam("pulPin") Integer pulPin,
-			@RequestParam("motorNum") Integer motorNum){
-//		MotorDriver md = new MotorDriver(dirPin, pulPin, motorNum);
-//		CommonCore.motorDrivers.add(md);
+	public String addMotors(@RequestParam("test") String test){
+		System.out.println("=--------------------"+test);
+		return "success";
 	}
+	/*
 	@RequestMapping(value = "/listMotors")
 	@ResponseBody
 	public void listMotors(){
