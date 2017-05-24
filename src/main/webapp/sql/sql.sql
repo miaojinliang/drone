@@ -55,5 +55,6 @@ create table plan_detail(
 	[id]			integer PRIMARY KEY autoincrement,
 	[drone_id]		integer,
 	[rasp_id]		integer,
-	[sort_num]		integer		
+	[sort_num]		integer,
+	[plan_id]		integer
 );

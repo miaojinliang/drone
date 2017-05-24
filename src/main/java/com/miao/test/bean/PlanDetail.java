@@ -10,6 +10,7 @@ public class PlanDetail {
 	private Integer droneId;//靶机id
 	private Integer raspId;//分机树莓派id
 	private Integer sortNum;//执行顺序
+	private Integer planId;//所属计划id
 	public Integer getId() {
 		return id;
 	}
@@ -33,5 +34,11 @@ public class PlanDetail {
 	}
 	public void setSortNum(Integer sortNum) {
 		this.sortNum = sortNum;
+	}
+	public Integer getPlanId() {
+		return planId;
+	}
+	public void setPlanId(Integer planId) {
+		this.planId = planId;
 	}
 }

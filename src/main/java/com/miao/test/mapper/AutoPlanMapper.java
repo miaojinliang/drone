@@ -12,4 +12,5 @@ public interface AutoPlanMapper {
 	void deleteAutoPlan(@Param("id") Integer id);
 	List<AutoPlan> getAutoPlans();
 	AutoPlan getById(@Param("id") Integer id);
+	void updateAutoPlan(AutoPlan autoPlan);
 }
