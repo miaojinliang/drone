@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.miao.test.bean.AutoPlan" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="DATETIME" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
   </resultMap>
   

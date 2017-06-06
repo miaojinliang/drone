@@ -29,4 +29,8 @@
   <select id="getById" resultType="com.miao.test.bean.PlanDetail">
   	SELECT * FROM plan_detail WHERE id = #{id}
   </select>
+  
+  <delete id="deletePlanDetailByPlanId">
+  	DELETE FORM plan_detail WHERE plan_id = #{planId}
+  </delete>
 </mapper>

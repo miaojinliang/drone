@@ -32,6 +32,7 @@
 <div data-role="page" id="pageCenter">
   <div data-role="header">
     <h1>中心控制台</h1>
+    <a href="${ctx }/auto"  data-transition="pop" class="ui-btn ui-btn-right ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left">自动化控制</a>
   </div>
   <div data-role="main" class="ui-content">
   
